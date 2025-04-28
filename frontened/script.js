@@ -682,7 +682,8 @@ async function apis() {
   const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   const API_BASE_URL = isDevelopment 
     ? 'http://localhost:8000' 
-    : 'https://your-render-service-name.onrender.com';
+    : 'https://ingre.onrender.com';
+
 
   const formData = new FormData();
   formData.append('image', image);
