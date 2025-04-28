@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingre Health Advisor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <!-- <link rel="stylesheet" href="dark-theme.css"> -->
+</head>
+<body>
+  <!-- Auth Container -->
+  <div class="auth-container">
+    <!-- Image Section -->
+    <div class="auth-image-section">
+        <div class="image-overlay"></div>
+        <div class="image-content">
+            <h1>Welcome to Ingre Health Advisor</h1>
+            <p>Your personalized nutrition companion for healthier choices</p>
+            <div class="image-scroll-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="auth-form-section">
+        <!-- Login Card -->
+        <div class="auth-card active" id="login-card">
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue your health journey</p>
+            </div>
+            
+            <form class="auth-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="login-email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                        <span class="toggle-password-container">
+                            <i class="fas fa-eye toggle-password"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="auth-button">
+                    <span>Sign In</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>or continue with</span>
+            </div>
+            
+            <div class="oauth-buttons">
+                <button class="oauth-button google">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button class="oauth-button facebook">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </button>
+            </div>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
+            </div>
+        </div>
+
+        <!-- Signup Card -->
+        <div class="auth-card" id="signup-card">
+            <div class="auth-header">
+                <h2>Create Account</h2>
+                <p>Start your health journey with us</p>
+            </div>
+            
+            <form class="auth-form" id="signup-form">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signup-name" placeholder="Enter your full name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signup-email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signup-password" placeholder="Create a password" required>
+                        <span class="toggle-password-container">
+                            <i class="fas fa-eye toggle-password"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signup-confirm" placeholder="Confirm your password" required>
+                        <span class="toggle-password-container">
+                            <i class="fas fa-eye toggle-password"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-button">
+                    <span>Sign Up</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>or sign up with</span>
+            </div>
+            
+            <div class="oauth-buttons">
+                <button class="oauth-button google">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button class="oauth-button facebook">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </button>
+            </div>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="#" id="show-login">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <!-- Main App Container (hidden by default) -->
+  <div class="app-container" id="app-container" style="display: none;">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo-container">
+          <div class="logo-icon-container">
+            <img src="images/logo4.png" alt="Ingre Health Logo" class="member-image">
+          </div>
+          <h1 class="app-title">Ingre Health Advisor</h1>
+        </div>
+        
+        <nav class="main-nav">
+          <button class="nav-button active" data-tab="home">
+            <i class="fas fa-home nav-icon"></i> Home
+          </button>
+          <button class="nav-button" data-tab="about">
+            <i class="fas fa-info-circle nav-icon"></i> About
+          </button>
+          <button class="nav-button" data-tab="contact">
+            <i class="fas fa-envelope nav-icon"></i> Contact
+          </button>
+          <button class="nav-button" data-tab="profile">
+            <i class="fas fa-user nav-icon"></i> Profile
+          </button>
+          <button class="nav-button" id="logout-button">
+            <i class="fas fa-sign-out-alt nav-icon"></i> Logout
+          </button>
+
+        </nav>
+        
+        <!-- <div class="theme-switcher">
+          <button class="current-theme" aria-label="Change theme">
+            <i class="fas fa-sun"></i>
+          </button>
+          <div class="theme-options">
+            <button class="theme-option active" data-theme="light" title="Light Theme">
+              <i class="fas fa-sun"></i> Light
+            </button>
+            <button class="theme-option" data-theme="dark" title="Dark Theme">
+              <i class="fas fa-moon"></i> Dark
+            </button>
+            <button class="theme-option" data-theme="green" title="Green Theme">
+              <i class="fas fa-leaf"></i> Green
+            </button>
+            <button class="theme-option" data-theme="blue" title="Blue Theme">
+              <i class="fas fa-droplet"></i> Blue
+            </button>
+          </div>
+        </div> -->
+        
+    
+
+        <button class="mobile-menu-button">
+          <span class="menu-icon">☰</span>
+        </button>
+
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Home Tab Content -->
+      <div class="tab-content active" id="home">
+        <div class="home-container">
+          <div class="hero-section">
+            <h2 class="hero-title">Smart Nutrition for Better Health</h2>
+            <p class="hero-subtitle">
+              Scan food labels or select your health conditions to get personalized recommendations
+            </p>
+          </div>
+
+          <div class="form-card">
+            <div class="form-section">
+              <label class="input-label" for="disease-search">
+                Search for Health Conditions
+              </label>
+              <div class="search-container">
+                <input
+                  id="disease-search"
+                  type="text"
+                  placeholder="Type to search diseases..."
+                  class="search-input"
+                />
+                <i class="fas fa-search search-icon"></i>
+              </div>
+              <ul class="suggestions-list"></ul>
+            </div>
+
+            <div class="selected-diseases-section">
+              <h3 class="section-title">Selected Conditions:</h3>
+              <div class="disease-chips"></div>
+            </div>
+
+            <div class="upload-section">
+              <label class="input-label">
+                Upload Food Label Image
+              </label>
+              <div class="upload-area">
+                <div class="upload-content">
+                  <i class="fas fa-upload upload-icon"></i>
+                  <p class="upload-text">Click to upload or drag and drop</p>
+                  <p class="upload-subtext">PNG, JPG up to 5MB</p>
+                </div>
+                <input
+                  type="file"
+                  class="file-input"
+                  accept="image/*"
+                />
+              </div>
+            </div>
+
+            <div class="submit-section">
+              <button class="submit-button">
+                Get Recommendations
+              </button>
+            </div>
+          </div>
+
+          <div class="results-card">
+            <h3 class="results-title">Analysis Results</h3>
+            <div class="recommendations-section">
+              <h4 class="section-title">Recommendations:</h4>
+              <ul class="recommendations-list"></ul>
+            </div>
+            <div class="warnings-section">
+              <h4 class="section-title">Warnings:</h4>
+              <ul class="warnings-list"></ul>
+            </div>
+          </div>
+          
+          <div class="tips-section">
+            <h3 class="tips-title">Nutrition Tips</h3>
+            <div class="tips-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- About Tab Content -->
+      <div class="tab-content" id="about">
+        <div class="about-container">
+          <h2 class="about-title">About Ingre Health Advisor</h2>
+          
+          <div class="about-content">
+            <p class="about-text">
+              In today's fast-paced world, consumers are becoming increasingly conscious about their health and the food they consume. However, understanding the nutritional information provided on food packaging can be confusing and time-consuming.
+            </p>
+            
+            <p class="about-text">
+              The <strong>Ingre Health Advisor</strong> aims to address this challenge by providing an easy-to-use solution that scans the backside of packaged food and evaluates how beneficial the ingredients are for an individual. By leveraging advanced scanning technologies and nutritional databases, this project seeks to empower users to make informed food choices that align with their health goals.
+            </p>
+            
+            <h3 class="section-heading">Our Technology</h3>
+            
+            <div class="technology-grid">
+              <div class="technology-card">
+                <div class="tech-icon-container">
+                  <svg class="tech-icon" viewBox="0 0 24 24">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                </div>
+                <h4 class="technology-title">AI-Powered Analysis</h4>
+                <p class="technology-text">
+                  Our system uses advanced machine learning algorithms to analyze nutritional information and provide personalized recommendations based on your health conditions.
+                </p>
+              </div>
+              
+              <div class="technology-card">
+                <div class="tech-icon-container">
+                  <svg class="tech-icon" viewBox="0 0 24 24">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                </div>
+                <h4 class="technology-title">Image Processing</h4>
+                <p class="technology-text">
+                  We use state-of-the-art OCR (Optical Character Recognition) technology to extract text from food labels with high accuracy, even under challenging conditions.
+                </p>
+              </div>
+            </div>
+            
+            <h3 class="section-heading">The Team</h3>
+            
+            <div class="team-grid">
+              <div class="team-member">
+                <div class="member-avatar">
+                  <img src="images/anish.jpeg" alt="Team Member" class="member-image">
+                </div>
+                <p class="member-name">Anish Raj</p>
+                <p class="member-id">2112009</p>
+              </div>
+              <div class="team-member">
+                <div class="member-avatar">
+                  <img src="images/amlan.jpeg" alt="Team Member" class="member-image">
+                </div>
+                <p class="member-name">Amlan Mohapatra</p>
+                <p class="member-id">2112032</p>
+              </div>
+              <div class="team-member">
+                <div class="member-avatar">
+                  <img src="images/ujjwal.jpeg" alt="Team Member" class="member-image">
+                </div>
+                <p class="member-name">Ujjwal Kumar</p>
+                <p class="member-id">2112079</p>
+              </div>
+              <div class="team-member">
+                <div class="member-avatar">
+                  <img src="images/yash.jpeg" alt="Team Member" class="member-image">
+                </div>
+                <p class="member-name">Yash Raj</p>
+                <p class="member-id">2112047</p>
+              </div>
+            </div>
+            
+            <div class="guidance-section">
+              <div class="guidance-content">
+                <div class="guide-avatar">
+                  <img src="images/dolendro_sir.jpeg" alt="Dr. L. Dolendro Singh" class="guide-image">
+                </div>
+                <div class="guide-info">
+                  <h4 class="guidance-title">Under the Guidance of</h4>
+                  <p class="guidance-text">Dr. L. Dolendro Singh</p>
+                  <p class="guidance-text">Dept. of CSE, NIT SILCHAR</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Tab Content -->
+      <div class="tab-content" id="contact">
+        <div class="contact-container">
+          <h2 class="contact-title">Contact Us</h2>
+          
+          <div class="contact-grid">
+            <div class="contact-info">
+              <h3 class="section-heading">Get in Touch</h3>
+              
+              <div class="contact-items">
+                <div class="contact-item">
+                  <div class="contact-icon-container">
+                    <i class="fas fa-envelope contact-icon"></i>
+                  </div>
+                  <div>
+                    <h4 class="contact-item-title">Email</h4>
+                    <p class="contact-item-text">contact@ingrehealthadvisor.com</p>
+                  </div>
+                </div>
+                
+                <div class="contact-item">
+                  <div class="contact-icon-container">
+                    <i class="fas fa-map-marker-alt contact-icon"></i>
+                  </div>
+                  <div>
+                    <h4 class="contact-item-title">Address</h4>
+                    <p class="contact-item-text">Department of Computer Science & Engineering</p>
+                    <p class="contact-item-text">NIT Silchar, Assam, India - 788010</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="contact-form-container">
+              <h3 class="section-heading">Send Us a Message</h3>
+              
+              <form class="contact-form">
+                <div class="form-group">
+                  <label for="name" class="form-label">Name</label>
+                  <input type="text" id="name" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" id="email" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                  <label for="message" class="form-label">Message</label>
+                  <textarea id="message" rows="4" class="form-textarea"></textarea>
+                </div>
+                
+                <button type="submit" class="form-submit-button">
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Tab Content -->
+      <div class="tab-content" id="profile">
+        <div class="profile-container">
+          <div class="profile-background"></div>
+          
+          <div class="profile-content">
+            <h2 class="profile-title">
+              <span class="title-letters">Your Profile</span>
+            </h2>
+            
+            <div class="profile-grid">
+              <!-- Profile Card -->
+              <div class="profile-card">
+                <div class="profile-header">
+                  <div class="profile-avatar">
+                    <div class="avatar-placeholder">
+                      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="40" r="20" fill="#e0f2fe"/>
+                        <circle cx="50" cy="100" r="40" fill="#e0f2fe"/>
+                      </svg>
+                    </div>
+                    <!-- <button class="edit-avatar-button pulse">
+                      <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" />
+                      </svg>
+                    </button> -->
+                  </div>
+                  <h3 class="profile-name" id="profile-name">User Name</h3>
+                  <p class="profile-email" id="profile-email">user@example.com</p>
+                </div>
+                
+                <div class="profile-stats">
+                  <div class="stat-item">
+                    <div class="stat-circle">
+                      <div class="stat-value" id="analysis-count">0</div>
+                    </div>
+                    <div class="stat-label">Analyses</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-circle">
+                      <div class="stat-value" id="conditions-count">0</div>
+                    </div>
+                    <div class="stat-label">Conditions</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- History Section -->
+              <div class="history-section">
+                <div class="section-header">
+                  <h3 class="section-heading">
+                    <span>Analysis History</span>
+                  </h3>
+                  <div class="view-all">View All</div>
+                </div>
+                
+                <div class="history-timeline">
+                  <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-date">Today, 10:30 AM</div>
+                      <div class="timeline-desc">Full body analysis completed</div>
+                      <div class="timeline-status completed">Completed</div>
+                    </div>
+                  </div>
+                  
+                  <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-date">Yesterday, 2:15 PM</div>
+                      <div class="timeline-desc">Cardiac health check</div>
+                      <div class="timeline-status completed">Completed</div>
+                    </div>
+                  </div>
+                  
+                  <div class="empty-state">
+                    <div class="empty-icon">
+                      <svg viewBox="0 0 24 24" width="48" height="48">
+                        <path fill="#e0f2fe" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+                      </svg>
+                    </div>
+                    <p class="empty-text">No more history available</p>
+                    <button class="empty-action">Start New Analysis</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <div class="footer-grid">
+          <div class="footer-about">
+            <h3 class="footer-heading1">Ingre Health Advisor</h3>
+            <p class="footer-text1">Empowering you with knowledge and insights to make confident, informed food choices — because every bite you take shapes your health, your energy, and your future. Choose wisely. Live fully. Thrive naturally.</p>
+          </div>
+          
+          <div class="footer-links">
+            <h4 class="footer-heading2">Quick Links</h4>
+            <ul class="footer-list1">
+              <li><button class="footer-link" data-tab="home">Home</button></li>
+              <li><button class="footer-link" data-tab="about">About</button></li>
+              <li><button class="footer-link" data-tab="contact">Contact</button></li>
+              <li><button class="footer-link" data-tab="profile">Profile</button></li>
+            </ul>
+          </div>
+          
+          <div class="footer-tech">
+            <h4 class="footer-heading3">Technology</h4>
+            <ul class="footer-list">
+              <li class="footer-text">React.js</li>
+              <li class="footer-text">Machine Learning</li>
+              <li class="footer-text">OCR Technology</li>
+              <li class="footer-text">Node.js</li>
+            </ul>
+          </div>
+          
+          <div class="footer-social">
+            <h4 class="footer-heading4">Connect With Us</h4>
+            <div class="social-icons">
+              <a href="#" class="social-icon">
+                <span class="sr-only">Facebook</span>
+                <i class="fab fa-facebook-f icon"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <span class="sr-only">Twitter</span>
+                <i class="fab fa-twitter icon"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <span class="sr-only">GitHub</span>
+                <i class="fab fa-github icon"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <span class="sr-only">LinkedIn</span>
+                <i class="fab fa-linkedin-in icon"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer-bottom">
+          <p>&copy; <span class="current-year"></span> Ingre Health Advisor. All rights reserved.</p>
+          <p class="footer-credits">B.Tech Project - Group 22, NIT Silchar</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="script.js"></script>
+  <!-- <script src="theme.js"></script> -->
+</body>
+</html>
