@@ -8,7 +8,10 @@ const cors = require('cors');
 
 
 const app = express();
-app.use(cors());
+// In your backend, make the CORS policy more permissive temporarily:
+app.use(cors({
+  origin: '*', // Allow all origins (for testing only)
+}));
 app.use(express.json());
 app.use(fileUpload({
   useTempFiles: true,
