@@ -680,47 +680,52 @@ function hideImagePreview() {
 const apis = async () => {
   const formData = new FormData();
   formData.append('image', image);
-  
+
+  // Dynamic backend URL detection
+  const backendUrl = window.location.hostname.includes('localhost') 
+    ? 'http://localhost:8000'
+    : 'https://ingre-10.onrender.com'; // <-- Replace with your Render URL
+
   try {
-    const response = await fetch('http://localhost:8000/upload', {
+    const response = await fetch(`${backendUrl}/upload`, {
       method: 'POST',
       body: formData,
     });
 
     const data = await response.json();
     const imageUrl = data.imageUrl;
-    
+
     try {
       console.log(imageUrl);
       const text = await puter.ai.img2txt(imageUrl);
+
       if (!text || text.trim() === "") {
         console.log('No text was detected in the image.');
         showResults({ status: 'error', message: 'No text detected in the image' });
         return;
       } 
+
       console.log(text);   
-      
+
       try {
         const API_KEY = "AIzaSyASew-7kpDXeKmtzZyLaQyhHMnRvyqQxgI"; 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-        const headers = {
-          "Content-Type": "application/json",
-        };
-        
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+        const headers = { "Content-Type": "application/json" };
         const body = {
           contents: [
             {
               parts: [
-                { text: `${text}\n\nList out the ingredient names and nutrition infromation in the text above.` }
+                { text: `${text}\n\nList out the ingredient names and nutrition information in the text above.` }
               ]
             }
           ]
         };
 
-        const response = await fetch(url, {
+        const response = await fetch(geminiUrl, {
           method: "POST",
           headers: headers,
-          body: JSON.stringify(body)
+          body: JSON.stringify(body),
         });
 
         if (!response.ok) {
@@ -737,8 +742,8 @@ const apis = async () => {
           showResults({ status: 'error', message: 'No ingredient data returned' });
           return;
         }
-        console.log(typeof(reply));
-        console.log("hi", reply);
+
+        console.log("Reply from Gemini for Ingredients:", reply);
 
         const format = `{
           "summary": "Brief 1-2 line product health overview",
@@ -753,8 +758,7 @@ const apis = async () => {
           "nutritionWarnings": ["List of nutrition issues"],
           "suggestedAlternatives": ["Healthier product ideas"]
         }`;
-        
-        // Create a prompt that includes the user's selected diseases
+
         const fullPrompt = `
           You are a health AI. Based on the following:
           Diseases: ${selectedDiseases.join(', ')}
@@ -762,35 +766,31 @@ const apis = async () => {
           Return a JSON like this: ${format}
           Analyze how good or bad this product is for someone with these conditions. Give a health score out of 10, rating (Good/Moderate/Poor), ingredient concerns, nutrition warnings, and whether it's recommended. Be concise and accurate.
         `;
-        
-        console.log(fullPrompt);
-        
+
+        console.log("Full prompt for Gemini:", fullPrompt);
+
         try {
-          const API_KEYY = "AIzaSyC7RvpI85zUO55tUWrfRMnRbtXF0lCFqeI";
-          const urll = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEYY}`;
-          const headerss = {
-            "Content-Type": "application/json",
-          };
-          
+          const API_KEYY = "AIzaSyC7RvpI85zUO55tUWrfRMnRbtXF0lCFqeI"; 
+          const geminiAnalysisUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEYY}`;
+
+          const headerss = { "Content-Type": "application/json" };
           const bodyy = {
             contents: [
               {
-                parts: [
-                  { text: fullPrompt }
-                ]
+                parts: [{ text: fullPrompt }]
               }
             ]
           };
 
-          const responsee = await fetch(urll, {
+          const responsee = await fetch(geminiAnalysisUrl, {
             method: "POST",
             headers: headerss,
-            body: JSON.stringify(bodyy)
+            body: JSON.stringify(bodyy),
           });
 
           if (!responsee.ok) {
             const errorData = await responsee.json();
-            console.error("Gemini API Error:", errorData);
+            console.error("Gemini Analysis API Error:", errorData);
             showResults({ status: 'error', message: 'Failed to get health recommendations' });
             return;
           }
@@ -802,12 +802,10 @@ const apis = async () => {
             showResults({ status: 'error', message: 'No recommendations returned' });
             return;
           }
-          
-          console.log(replyy);
-          
-          // Parse the JSON response and display it
+
+          console.log("Health recommendation raw reply:", replyy);
+
           try {
-            // The response might include code blocks or extra text, so we need to extract just the JSON
             const jsonMatch = replyy.match(/\{[\s\S]*\}/);
             const jsonStr = jsonMatch ? jsonMatch[0] : replyy;
             const analysisResult = JSON.parse(jsonStr);
@@ -822,27 +820,29 @@ const apis = async () => {
           }
 
         } catch (err) {
-          console.log("No response get after sending text for recommendation.", err);
+          console.log("Error while getting health recommendation:", err);
           showResults({ status: 'error', message: 'Failed to get recommendations' });
           return;
         }
 
       } catch (error) {
-        console.log("No response get after sending text for extracting ingredients.", error);
+        console.log("Error during ingredients extraction:", error);
         showResults({ status: 'error', message: 'Failed to extract ingredients' });
         return;
       }
 
     } catch (error) {
-      console.log("unable to convert image to text");
+      console.log("Unable to convert image to text:", error);
       showResults({ status: 'error', message: 'Unable to read text from image' });
       return;
     }
+
   } catch (error) {
-    console.log("unable to get the image URL")
+    console.log("Error while uploading image:", error);
     showResults({ status: 'error', message: 'Unable to upload image' });
   }
 }
+
 
 
 // Handle form submission
