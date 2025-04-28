@@ -677,170 +677,155 @@ function hideImagePreview() {
     </div>
   `;
 }
-const apis = async () => {
+async function apis() {
+  // Determine API base URL based on environment
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const API_BASE_URL = isDevelopment 
+    ? 'http://localhost:8000' 
+    : 'https://your-render-service-name.onrender.com';
+
   const formData = new FormData();
   formData.append('image', image);
   
   try {
-    const response = await fetch('http://localhost:8000/upload', {
+    // 1. Upload image to backend
+    const uploadResponse = await fetch(`${API_BASE_URL}/upload`, {
       method: 'POST',
       body: formData,
     });
 
-    const data = await response.json();
-    const imageUrl = data.imageUrl;
+    if (!uploadResponse.ok) {
+      throw new Error(`Upload failed: ${uploadResponse.status}`);
+    }
+
+    const uploadData = await uploadResponse.json();
+    const imageUrl = uploadData.imageUrl;
     
+    // 2. Extract text from image
+    let extractedText;
     try {
-      console.log(imageUrl);
-      const text = await puter.ai.img2txt(imageUrl);
-      if (!text || text.trim() === "") {
-        console.log('No text was detected in the image.');
-        showResults({ status: 'error', message: 'No text detected in the image' });
-        return;
-      } 
-      console.log(text);   
-      
-      try {
-        const API_KEY = "AIzaSyASew-7kpDXeKmtzZyLaQyhHMnRvyqQxgI"; 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-        const headers = {
-          "Content-Type": "application/json",
-        };
-        
-        const body = {
-          contents: [
-            {
-              parts: [
-                { text: `${text}\n\nList out the ingredient names and nutrition infromation in the text above.` }
-              ]
-            }
-          ]
-        };
-
-        const response = await fetch(url, {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(body)
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Gemini API Error:", errorData);
-          showResults({ status: 'error', message: 'Failed to analyze ingredients' });
-          return;
-        }
-
-        const data = await response.json();
-        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!reply) {
-          showResults({ status: 'error', message: 'No ingredient data returned' });
-          return;
-        }
-        console.log(typeof(reply));
-        console.log("hi", reply);
-
-        const format = `{
-          "summary": "Brief 1-2 line product health overview",
-          "rating": "Good | Moderate | Poor",
-          "scoreOutOf10": 0-10,
-          "verdict": "Should someone eat this? Why?",
-          "recommendedFor": ["Diseases where it's okay"],
-          "notRecommendedFor": ["Diseases where it's harmful"],
-          "ingredientConcerns": [
-            { "ingredient": "Name", "concern": "Whether it's bad or good and why" }
-          ],
-          "nutritionWarnings": ["List of nutrition issues"],
-          "suggestedAlternatives": ["Healthier product ideas"]
-        }`;
-        
-        // Create a prompt that includes the user's selected diseases
-        const fullPrompt = `
-          You are a health AI. Based on the following:
-          Diseases: ${selectedDiseases.join(', ')}
-          Ingredients & Nutrition: ${reply}
-          Return a JSON like this: ${format}
-          Analyze how good or bad this product is for someone with these conditions. Give a health score out of 10, rating (Good/Moderate/Poor), ingredient concerns, nutrition warnings, and whether it's recommended. Be concise and accurate.
-        `;
-        
-        console.log(fullPrompt);
-        
-        try {
-          const API_KEYY = "AIzaSyC7RvpI85zUO55tUWrfRMnRbtXF0lCFqeI";
-          const urll = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEYY}`;
-          const headerss = {
-            "Content-Type": "application/json",
-          };
-          
-          const bodyy = {
-            contents: [
-              {
-                parts: [
-                  { text: fullPrompt }
-                ]
-              }
-            ]
-          };
-
-          const responsee = await fetch(urll, {
-            method: "POST",
-            headers: headerss,
-            body: JSON.stringify(bodyy)
-          });
-
-          if (!responsee.ok) {
-            const errorData = await responsee.json();
-            console.error("Gemini API Error:", errorData);
-            showResults({ status: 'error', message: 'Failed to get health recommendations' });
-            return;
-          }
-
-          const dataa = await responsee.json();
-          const replyy = dataa?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-          if (!replyy) {
-            showResults({ status: 'error', message: 'No recommendations returned' });
-            return;
-          }
-          
-          console.log(replyy);
-          
-          // Parse the JSON response and display it
-          try {
-            // The response might include code blocks or extra text, so we need to extract just the JSON
-            const jsonMatch = replyy.match(/\{[\s\S]*\}/);
-            const jsonStr = jsonMatch ? jsonMatch[0] : replyy;
-            const analysisResult = JSON.parse(jsonStr);
-            showResults({ status: 'success', analysisData: analysisResult });
-          } catch (jsonError) {
-            console.error("Error parsing JSON response:", jsonError);
-            showResults({ 
-              status: 'partial', 
-              message: 'Could not parse full results, showing raw data',
-              rawData: replyy 
-            });
-          }
-
-        } catch (err) {
-          console.log("No response get after sending text for recommendation.", err);
-          showResults({ status: 'error', message: 'Failed to get recommendations' });
-          return;
-        }
-
-      } catch (error) {
-        console.log("No response get after sending text for extracting ingredients.", error);
-        showResults({ status: 'error', message: 'Failed to extract ingredients' });
-        return;
+      extractedText = await puter.ai.img2txt(imageUrl);
+      if (!extractedText || extractedText.trim() === "") {
+        throw new Error('No text detected in the image');
       }
-
-    } catch (error) {
-      console.log("unable to convert image to text");
-      showResults({ status: 'error', message: 'Unable to read text from image' });
+      console.log('Extracted Text:', extractedText);   
+    } catch (textError) {
+      console.error("Text extraction error:", textError);
+      showResults({ 
+        status: 'error', 
+        message: 'Failed to extract text from image. Please ensure the image is clear and contains readable text.'
+      });
       return;
     }
+
+    // 3. Analyze ingredients with Gemini API
+    const GEMINI_API_KEY = "AIzaSyASew-7kpDXeKmtzZyLaQyhHMnRvyqQxgI"; 
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+    
+    const ingredientsPrompt = `${extractedText}\n\nList out the ingredient names and nutrition information in the text above.`;
+    
+    const geminiResponse = await fetch(geminiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: ingredientsPrompt }] }]
+      })
+    });
+
+    if (!geminiResponse.ok) {
+      const errorData = await geminiResponse.json();
+      console.error("Gemini API Error:", errorData);
+      throw new Error('Failed to analyze ingredients');
+    }
+
+    const geminiData = await geminiResponse.json();
+    const ingredientsAnalysis = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!ingredientsAnalysis) {
+      throw new Error('No ingredient data returned');
+    }
+
+    // 4. Get health recommendations
+    const format = `{
+      "summary": "Brief 1-2 line product health overview",
+      "rating": "Good | Moderate | Poor",
+      "scoreOutOf10": 0-10,
+      "verdict": "Should someone eat this? Why?",
+      "recommendedFor": ["Diseases where it's okay"],
+      "notRecommendedFor": ["Diseases where it's harmful"],
+      "ingredientConcerns": [
+        { "ingredient": "Name", "concern": "Whether it's bad or good and why" }
+      ],
+      "nutritionWarnings": ["List of nutrition issues"],
+      "suggestedAlternatives": ["Healthier product ideas"]
+    }`;
+    
+    const healthPrompt = `
+      You are a health AI. Analyze this product for someone with: ${selectedDiseases.join(', ')}
+      Ingredients & Nutrition: ${ingredientsAnalysis}
+      Return JSON in this format: ${format}
+      Be concise and accurate in your analysis.
+    `;
+
+    const healthResponse = await fetch(geminiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: healthPrompt }] }]
+      })
+    });
+
+    if (!healthResponse.ok) {
+      const errorData = await healthResponse.json();
+      console.error("Gemini API Error:", errorData);
+      throw new Error('Failed to get health recommendations');
+    }
+
+    const healthData = await healthResponse.json();
+    const healthAnalysis = healthData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!healthAnalysis) {
+      throw new Error('No health recommendations returned');
+    }
+    
+    // 5. Parse and display results
+    try {
+      const jsonMatch = healthAnalysis.match(/\{[\s\S]*\}/);
+      const jsonStr = jsonMatch ? jsonMatch[0] : healthAnalysis;
+      const analysisResult = JSON.parse(jsonStr);
+      
+      // Add to user history
+      const analysisRecord = {
+        date: new Date().toISOString(),
+        conditions: [...selectedDiseases],
+        result: analysisResult
+      };
+      userHistory.unshift(analysisRecord);
+      localStorage.setItem('userHistory', JSON.stringify(userHistory));
+      
+      showResults({ 
+        status: 'success', 
+        analysisData: analysisResult 
+      });
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      showResults({ 
+        status: 'partial', 
+        message: 'Showing raw analysis data',
+        rawData: healthAnalysis 
+      });
+    }
+
   } catch (error) {
-    console.log("unable to get the image URL")
-    showResults({ status: 'error', message: 'Unable to upload image' });
+    console.error("API Error:", error);
+    showResults({ 
+      status: 'error', 
+      message: error.message || 'An error occurred during analysis'
+    });
   }
 }
 
