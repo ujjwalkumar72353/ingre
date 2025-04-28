@@ -10,8 +10,9 @@ const cors = require('cors');
 const app = express();
 // In your backend, make the CORS policy more permissive temporarily:
 app.use(cors({
-  origin: '*', // Allow all origins (for testing only)
+  origin: 'https://ingre-7.onrender.com',
 }));
+
 app.use(express.json());
 app.use(fileUpload({
   useTempFiles: true,
