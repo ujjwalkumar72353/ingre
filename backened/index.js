@@ -1,6 +1,7 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
+const path = require('path');
 const fs = require('fs');
 
 const cors = require('cors');
@@ -51,6 +52,10 @@ app.post('/upload', async (req, res) => {
     console.error('Error:', err.response?.data || err.message);
     res.status(500).send({ error: 'Something went wrong.' });
   }
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 8000;
