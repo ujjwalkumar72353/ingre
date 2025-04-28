@@ -10,8 +10,9 @@ const cors = require('cors');
 const app = express();
 // In your backend, make the CORS policy more permissive temporarily:
 app.use(cors({
-  origin: 'https://ingre-7.onrender.com',
+  origin: '*'
 }));
+
 
 app.use(express.json());
 app.use(fileUpload({
@@ -66,6 +67,7 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 8000;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
